@@ -1,3 +1,4 @@
+import 'package:curated_list_task/components/widget/newlist.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:curated_list_task/presentation/provider/curated_provider.dart';
@@ -12,12 +13,26 @@ class CuratedHomeScreen extends StatefulWidget {
 
 class _CuratedHomeScreenState extends State<CuratedHomeScreen> {
   final TextEditingController _search = TextEditingController();
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       Provider.of<CuratedProvider>(context, listen: false).fetchEvents();
     });
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _showAddListDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AddListDialog(),
+    );
   }
 
   @override
@@ -69,6 +84,10 @@ class _CuratedHomeScreenState extends State<CuratedHomeScreen> {
             ],
           );
         },
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _showAddListDialog,
+        child: Icon(Icons.add),
       ),
     );
   }
