@@ -5,6 +5,7 @@ import 'package:curated_list_task/domain/models/curated_list_models.dart';
 
 class CuratedProvider with ChangeNotifier {
   List<Datum> list = [];
+  List<Datum> filteredlist = [];
   bool isLoading = true;
   bool isError = false;
 
@@ -51,5 +52,18 @@ class CuratedProvider with ChangeNotifier {
       isLoading = false;
       notifyListeners();
     }
+  }
+
+  void searchList(String searchTerm) {
+    if (searchTerm.isEmpty) {
+      filteredlist = [];
+    } else {
+      filteredlist = list
+          .where((list) =>
+              list.title?.toLowerCase().contains(searchTerm.toLowerCase()) ??
+              false)
+          .toList();
+    }
+    notifyListeners();
   }
 }

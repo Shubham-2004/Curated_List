@@ -11,6 +11,7 @@ class CuratedHomeScreen extends StatefulWidget {
 }
 
 class _CuratedHomeScreenState extends State<CuratedHomeScreen> {
+  final TextEditingController _search = TextEditingController();
   @override
   void initState() {
     super.initState();
@@ -27,23 +28,46 @@ class _CuratedHomeScreenState extends State<CuratedHomeScreen> {
       ),
       body: Consumer<CuratedProvider>(
         builder: (context, provider, child) {
-          if (provider.isLoading) {
-            return Center(child: CircularProgressIndicator());
-          } else if (provider.isError) {
-            return Center(
-              child: Text('Failed to load events. Please try again later.'),
-            );
-          } else if (provider.list.isEmpty) {
-            return Center(child: Text('No events found'));
-          } else {
-            return ListView.builder(
-              itemCount: provider.list.length,
-              itemBuilder: (context, index) {
-                final list = provider.list[index];
-                return Listcard(list: list);
-              },
-            );
-          }
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: TextField(
+                  controller: _search,
+                  decoration: InputDecoration(
+                    labelText: 'Search',
+                    border: OutlineInputBorder(),
+                  ),
+                  onChanged: (text) {
+                    provider.searchList(text);
+                  },
+                ),
+              ),
+              Expanded(
+                child: provider.isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : provider.isError
+                        ? Center(
+                            child: Text(
+                                'Failed to load events. Please try again later.'),
+                          )
+                        : provider.list.isEmpty
+                            ? Center(child: Text('No events found'))
+                            : ListView.builder(
+                                itemCount: _search.text.isNotEmpty
+                                    ? provider.filteredlist.length
+                                    : provider.list.length,
+                                itemBuilder: (context, index) {
+                                  final list = _search.text.isNotEmpty
+                                      ? provider.filteredlist[index]
+                                      : provider.list[index];
+
+                                  return Listcard(list: list);
+                                },
+                              ),
+              ),
+            ],
+          );
         },
       ),
     );
